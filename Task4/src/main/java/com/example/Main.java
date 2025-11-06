@@ -1,39 +1,19 @@
 package com.example;
 
+import com.example.config.DataSourceConfig;
 import com.example.service.UserService;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
-import javax.sql.DataSource;
 import java.util.List;
 
-@Configuration
-@ComponentScan(basePackages = "com.example")
+@ComponentScan
 public class Main {
-
-    @Bean
-    public DataSource dataSource() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:postgresql://localhost:5432/postgres");
-        config.setUsername("postgres");
-        config.setPassword("postgres");
-        config.setDriverClassName("org.postgresql.Driver");
-        config.setMaximumPoolSize(10);
-        config.setMinimumIdle(5);
-        config.setConnectionTimeout(30000);
-        config.setIdleTimeout(600000);
-        config.setMaxLifetime(1800000);
-
-        return new HikariDataSource(config);
-    }
 
     public static void main(String[] args) {
         // Создание Spring Context
-        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Main.class)) {
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+                Main.class, DataSourceConfig.class)) {
             // Получение бина UserService
             UserService userService = context.getBean(UserService.class);
             
