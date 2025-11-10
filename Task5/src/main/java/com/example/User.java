@@ -1,7 +1,16 @@
 package com.example;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "users")
 public class User {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
     public User() {

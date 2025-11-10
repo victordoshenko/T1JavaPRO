@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: task4-postgres
+    container_name: task5-postgres
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
