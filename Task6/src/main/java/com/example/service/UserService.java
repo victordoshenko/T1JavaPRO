@@ -2,6 +2,8 @@ package com.example.service;
 
 import com.example.User;
 import com.example.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +13,7 @@ import java.util.Optional;
 @Service
 public class UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -22,7 +25,7 @@ public class UserService {
         // Проверяем, существует ли пользователь с таким username
         Optional<User> existingUser = userRepository.findByUsername(username);
         if (existingUser.isPresent()) {
-            System.out.println("   Пользователь '" + username + "' уже существует: " + existingUser.get());
+            log.error("Пользователь '{}' уже существует: {}", username, existingUser.get());
             return existingUser.get();
         }
         
@@ -37,11 +40,17 @@ public class UserService {
             userRepository.deleteById(id);
             return true;
         }
+        log.error("Пользователь с id={} не найден для удаления", id);
         return false;
     }
 
     public User getUser(Long id) {
-        return userRepository.findById(id).orElse(null);
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            log.error("Пользователь с id={} не найден", id);
+            return null;
+        }
+        return user.get();
     }
 
     public List<User> getAllUsers() {
