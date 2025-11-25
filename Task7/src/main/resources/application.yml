@@ -34,4 +34,8 @@ spring:
     # В продакшене эту строку нужно удалить или закомментировать
     validate-on-migrate: false
 
+payment:
+  product-service:
+    base-url: ${PAYMENT_PRODUCT_SERVICE_BASE_URL:http://localhost:${server.port:8080}}
+
 
