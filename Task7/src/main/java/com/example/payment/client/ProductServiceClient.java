@@ -6,7 +6,6 @@ import com.example.payment.exception.ProductServiceIntegrationException;
 import com.example.payment.exception.ProductServiceUnavailableException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
@@ -37,12 +36,16 @@ public class ProductServiceClient {
                 .buildAndExpand(userId)
                 .toUri();
         try {
-            ResponseEntity<ProductResponse[]> response = restTemplate.getForEntity(uri, ProductResponse[].class);
-            ProductResponse[] body = response.getBody();
+            ProductResponse[] body = restTemplate.getForObject(uri, ProductResponse[].class);
             if (body == null || body.length == 0) {
                 return Collections.emptyList();
             }
             return Arrays.asList(body);
+        } catch (ProductServiceIntegrationException ex) {
+            throw new ProductServiceIntegrationException(
+                    "Failed to fetch products for user %d: %s".formatted(userId, ex.getMessage()), ex);
+        } catch (ProductServiceUnavailableException ex) {
+            throw ex;
         } catch (HttpStatusCodeException ex) {
             throw new ProductServiceIntegrationException(errorMessage("user products", userId, ex), ex);
         } catch (RestClientException ex) {
@@ -62,6 +65,13 @@ public class ProductServiceClient {
                         .formatted(productId));
             }
             return product;
+        } catch (ProductNotFoundException ex) {
+            throw new ProductNotFoundException("Product %d not found: %s".formatted(productId, ex.getMessage()), ex);
+        } catch (ProductServiceIntegrationException ex) {
+            throw new ProductServiceIntegrationException(
+                    "Failed to fetch product %d: %s".formatted(productId, ex.getMessage()), ex);
+        } catch (ProductServiceUnavailableException ex) {
+            throw ex;
         } catch (HttpStatusCodeException ex) {
             if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new ProductNotFoundException("Product %d not found".formatted(productId));

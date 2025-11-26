@@ -4,6 +4,10 @@ import org.springframework.http.HttpStatus;
 
 public class ProductServiceUnavailableException extends PaymentModuleException {
 
+    public ProductServiceUnavailableException(String message) {
+        super(message, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
     public ProductServiceUnavailableException(String message, Throwable cause) {
         super(message, HttpStatus.SERVICE_UNAVAILABLE, cause);
     }
