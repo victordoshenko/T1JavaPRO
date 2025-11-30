@@ -2,7 +2,7 @@ package com.example.payment.client;
 
 import com.example.dto.ProductResponse;
 import com.example.payment.exception.ProductNotFoundException;
-import com.example.payment.exception.ProductServiceIntegrationException;
+import com.example.payment.exception.ProductServiceUnavailableException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
@@ -59,7 +59,7 @@ class ProductServiceClientTest {
         mockServer.expect(requestTo("http://localhost:8089/api/v1/products/10"))
                 .andRespond(MockRestResponseCreators.withServerError());
 
-        assertThrows(ProductServiceIntegrationException.class, () -> client.getProductById(10L));
+        assertThrows(ProductServiceUnavailableException.class, () -> client.getProductById(10L));
     }
 
     @TestConfiguration
@@ -67,7 +67,9 @@ class ProductServiceClientTest {
 
         @Bean
         RestTemplate restTemplate(RestTemplateBuilder builder) {
-            return builder.build();
+            return builder
+                    .errorHandler(new ProductServiceResponseErrorHandler())
+                    .build();
         }
     }
 }
