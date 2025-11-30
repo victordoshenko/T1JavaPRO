@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="4" author="system">
+        <sql>
+            INSERT INTO products (account_number, balance, product_type, user_id)
+            SELECT 'ACC-10001', 1200.50, 'ACCOUNT', id
+            FROM users
+            WHERE username = 'test_user_1'
+            ON CONFLICT (account_number) DO NOTHING;
+        </sql>
+        <sql>
+            INSERT INTO products (account_number, balance, product_type, user_id)
+            SELECT 'CARD-20001', 500.00, 'CARD', id
+            FROM users
+            WHERE username = 'test_user_1'
+            ON CONFLICT (account_number) DO NOTHING;
+        </sql>
+        <sql>
+            INSERT INTO products (account_number, balance, product_type, user_id)
+            SELECT 'ACC-10002', 3000.00, 'ACCOUNT', id
+            FROM users
+            WHERE username = 'test_user_2'
+            ON CONFLICT (account_number) DO NOTHING;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
+
+
