@@ -18,6 +18,11 @@ public interface UserLimitRepository extends JpaRepository<UserLimit, Long> {
     @Modifying
     @Query("UPDATE UserLimit ul SET ul.currentLimit = :defaultLimit, ul.updatedAt = CURRENT_TIMESTAMP")
     int resetAllLimitsToDefault(@Param("defaultLimit") BigDecimal defaultLimit);
+
+    @Modifying
+    @Query("UPDATE UserLimit ul SET ul.defaultLimit = :newDefaultLimit, ul.updatedAt = CURRENT_TIMESTAMP")
+    int updateDefaultLimitForAll(@Param("newDefaultLimit") BigDecimal newDefaultLimit);
 }
+
 
 

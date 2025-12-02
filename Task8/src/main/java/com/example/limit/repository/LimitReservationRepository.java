@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -20,12 +21,17 @@ public interface LimitReservationRepository extends JpaRepository<LimitReservati
     List<LimitReservation> findByUserIdAndStatus(Long userId, ReservationStatus status);
     
     @Query("SELECT COALESCE(SUM(lr.amount), 0) FROM LimitReservation lr WHERE lr.userId = :userId AND lr.status = :status")
-    java.math.BigDecimal sumReservedAmountByUserIdAndStatus(@Param("userId") Long userId, @Param("status") ReservationStatus status);
+    BigDecimal sumReservedAmountByUserIdAndStatus(@Param("userId") Long userId, @Param("status") ReservationStatus status);
     
     @Modifying
     @Query("UPDATE LimitReservation lr SET lr.status = :newStatus WHERE lr.status = :oldStatus AND lr.expiresAt < :now")
     int expireOldReservations(@Param("oldStatus") ReservationStatus oldStatus, 
                               @Param("newStatus") ReservationStatus newStatus, 
                               @Param("now") LocalDateTime now);
+
+    @Modifying
+    @Query("UPDATE LimitReservation lr SET lr.status = :newStatus WHERE lr.status = :oldStatus")
+    int updateStatusForAllByCurrentStatus(@Param("oldStatus") ReservationStatus oldStatus,
+                                          @Param("newStatus") ReservationStatus newStatus);
 }
 

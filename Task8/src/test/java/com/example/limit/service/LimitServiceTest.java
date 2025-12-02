@@ -118,7 +118,6 @@ class LimitServiceTest {
         UserLimit userLimit = new UserLimit(USER_ID, DEFAULT_LIMIT, DEFAULT_LIMIT);
         
         when(userLimitRepository.findByUserId(USER_ID)).thenReturn(Optional.of(userLimit));
-        when(reservationRepository.findByOperationId(anyString())).thenReturn(Optional.empty());
         when(reservationRepository.sumReservedAmountByUserIdAndStatus(USER_ID, LimitReservation.ReservationStatus.PENDING))
                 .thenReturn(BigDecimal.ZERO);
         
@@ -139,8 +138,6 @@ class LimitServiceTest {
         
         when(reservationRepository.findByOperationId(operationId)).thenReturn(Optional.of(reservation));
         when(userLimitRepository.findByUserId(USER_ID)).thenReturn(Optional.of(userLimit));
-        when(reservationRepository.sumReservedAmountByUserIdAndStatus(USER_ID, LimitReservation.ReservationStatus.PENDING))
-                .thenReturn(amount);
         
         // When
         limitService.confirmOperation(operationId);

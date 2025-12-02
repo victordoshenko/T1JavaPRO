@@ -6,7 +6,7 @@ import com.example.limit.dto.LimitResponse;
 import com.example.limit.dto.ReservationResponse;
 import com.example.limit.exception.InsufficientLimitException;
 import com.example.limit.exception.ReservationNotFoundException;
-import com.example.limit.service.LimitService;
+import com.example.limit.service.LimitServiceApi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ class LimitControllerTest {
     private MockMvc mockMvc;
     
     @MockBean
-    private LimitService limitService;
+    private LimitServiceApi limitService;
     
     @Autowired
     private ObjectMapper objectMapper;
@@ -172,5 +172,6 @@ class LimitControllerTest {
                 .andExpect(status().isNotFound());
     }
 }
+
 
 

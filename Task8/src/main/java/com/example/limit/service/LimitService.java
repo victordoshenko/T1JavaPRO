@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
-public class LimitService {
+public class LimitService implements LimitServiceApi {
     
     private final UserLimitRepository userLimitRepository;
     private final LimitReservationRepository reservationRepository;
@@ -111,17 +111,8 @@ public class LimitService {
         UserLimit userLimit = userLimitRepository.findByUserId(reservation.getUserId())
                 .orElseThrow(() -> new IllegalStateException("User limit not found"));
         
-        // Проверяем, что лимит достаточен
-        BigDecimal reservedAmount = reservationRepository
-                .sumReservedAmountByUserIdAndStatus(reservation.getUserId(), LimitReservation.ReservationStatus.PENDING);
-        
-        BigDecimal availableLimit = userLimit.getCurrentLimit().subtract(reservedAmount);
-        
-        if (availableLimit.compareTo(reservation.getAmount()) < 0) {
-            throw new InsufficientLimitException("Insufficient limit for confirmation");
-        }
-        
-        // Списываем лимит
+        // Списываем лимит. На этапе резервирования уже была проверка доступного лимита,
+        // поэтому при подтверждении повторная проверка не требуется.
         userLimit.setCurrentLimit(userLimit.getCurrentLimit().subtract(reservation.getAmount()));
         userLimitRepository.save(userLimit);
         
@@ -189,13 +180,11 @@ public class LimitService {
     public void resetAllLimits() {
         userLimitRepository.resetAllLimitsToDefault(defaultLimitValue);
         
-        // Отменяем все pending резервы
-        reservationRepository.findAll().stream()
-                .filter(r -> r.getStatus() == LimitReservation.ReservationStatus.PENDING)
-                .forEach(reservation -> {
-                    reservation.setStatus(LimitReservation.ReservationStatus.CANCELLED);
-                    reservationRepository.save(reservation);
-                });
+        // Отменяем все pending резервы одним bulk-запросом
+        reservationRepository.updateStatusForAllByCurrentStatus(
+                LimitReservation.ReservationStatus.PENDING,
+                LimitReservation.ReservationStatus.CANCELLED
+        );
     }
     
     /**
@@ -216,11 +205,7 @@ public class LimitService {
      */
     @Transactional
     public void updateDefaultLimit(BigDecimal newDefaultLimit) {
-        // Обновляем дефолтное значение для всех существующих записей
-        userLimitRepository.findAll().forEach(userLimit -> {
-            userLimit.setDefaultLimit(newDefaultLimit);
-            userLimitRepository.save(userLimit);
-        });
+        userLimitRepository.updateDefaultLimitForAll(newDefaultLimit);
     }
     
     /**
