@@ -18,7 +18,7 @@
     <packaging>jar</packaging>
 
     <name>Task8</name>
-    <description>Spring Boot application with PostgreSQL, JPA and Flyway</description>
+    <description>Spring Boot application with PostgreSQL, JPA and Liquibase</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -53,10 +53,17 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Flyway for database migrations -->
+        <!-- Liquibase for database migrations -->
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+
+        <!-- H2 Database for testing -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- Testing -->
